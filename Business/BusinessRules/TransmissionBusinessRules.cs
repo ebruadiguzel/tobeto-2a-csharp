@@ -10,7 +10,7 @@ public class TransmissionBusinessRules
         _transmissionDal = transmissionDal;
     }
     
-    public void CheckIfTransmissionNmeNotExists(string fuelName)
+    public void CheckIfTransmissionNameNotExists(string fuelName)
     {
         bool isExists = _transmissionDal.GetList().Any(x => x.Name == fuelName);
         if (isExists)

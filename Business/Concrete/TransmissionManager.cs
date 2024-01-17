@@ -23,7 +23,7 @@ public class TransmissionManager : ITransmissionService
     
     public AddTransmissionResponse Add(AddTransmissionRequest request)
     {
-        _transmissionBusinessRules.CheckIfTransmissionNmeNotExists(request.Name);
+        _transmissionBusinessRules.CheckIfTransmissionNameNotExists(request.Name);
 
         Transmission transmissionToAdd = _mapper.Map<Transmission>(request);
 
