@@ -19,39 +19,48 @@ public class ModelController : ControllerBase
     }
     
     [HttpGet]
-    public ICollection<Model> GetList()
+    public GetModelListResponse GetList([FromQuery] GetModelListRequest request)
     {
-        IList<Model> modelList = _modelService.GetList();
-        return modelList; 
+        GetModelListResponse response = _modelService.GetList(request);
+        return response; 
     }
     
-    [HttpPost] 
+    [HttpPost] // POST http://localhost:5245/api/models
     public ActionResult<AddModelResponse> Add(AddModelRequest request)
     {
         AddModelResponse response = _modelService.Add(request);
         
-        return CreatedAtAction(nameof(Add), response); 
+        return CreatedAtAction(
+            actionName: nameof(GetById),
+            routeValues: new { Id = response.Id}, // Anonymous object // REsponse Header: Location = http://localhost:5245/api/models/1
+            value:response // REsponse body
+            ); 
     }
     
-    [HttpPut]
-    public ActionResult<UpdateModelResponse> Update(UpdateModelRequest request)
+    [HttpPut("{Id}")] // PUT http://localhost:5245/api/models/1
+    public ActionResult<UpdateModelResponse> Update([FromRoute] int Id,[FromBody]UpdateModelRequest request)
     {
+        if (Id != request.Id)
+        {
+            return BadRequest();
+        }
+        
         UpdateModelResponse response = _modelService.Update(request);
         return Ok(response);
     }
 
     [HttpDelete]
-    public ActionResult<bool> Delete(DeleteModelRequest request)
+    public DeleteModelResponse Delete(DeleteModelRequest request)
     {
-        bool response = _modelService.Delete(request);
-        return Ok(response);
+        DeleteModelResponse response = _modelService.Delete(request);
+        return response;
     }
     
-    [HttpGet]
-    public ActionResult<Model> GetById(int id)
+    [HttpGet("{Id}")] // GET http://localhost:5245/api/models/{Id}
+    public GetModelByIdResponse GetById([FromRoute] GetModelByIdRequest request)
     {
-        Model response = _modelService.GetById(id);
-        return Ok(response);
+        GetModelByIdResponse response = _modelService.GetById(request);
+        return response;
     }
     
         

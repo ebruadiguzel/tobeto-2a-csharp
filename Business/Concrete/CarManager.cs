@@ -39,7 +39,7 @@ public class CarManager : ICarService
         _carBusinessRules.CheckIfCarIdExists(request.Id);
         _carBusinessRules.CheckModelYearGreaterThanTwenty(request.ModelYear);
         
-        Car carToUpdate = _carDal.GetById(request.Id);
+        Car carToUpdate = _carDal.Get(predicate: model => model. Id == request.Id);
 
         carToUpdate.ModelYear = request.ModelYear;
         carToUpdate.CarState = request.CarState;
@@ -59,7 +59,7 @@ public class CarManager : ICarService
     public bool Delete(DeleteCarRequest request)
     {
         _carBusinessRules.CheckIfCarIdExists(request.Id);
-        Car carToDelete = _carDal.GetById(request.Id);
+        Car carToDelete = _carDal.Get(predicate: model => model. Id == request.Id);
         
         _carDal.Delete(carToDelete);
         return true;
@@ -74,7 +74,7 @@ public class CarManager : ICarService
     public Car GetById(int id)
     {
         _carBusinessRules.CheckIfCarIdExists(id);
-        Car car = _carDal.GetById(id);
+        Car car = _carDal.Get(predicate: model => model.Id == id);
         return car;
     }
 }

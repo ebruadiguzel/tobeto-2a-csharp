@@ -36,7 +36,7 @@ public class FuelManager : IFuelService
     public UpdateFuelResponse Update(UpdateFuelRequest request)
     {
         _fuelBusinessRules.CheckIfFuelIdExists(request.Id);
-        Fuel fuelToUpdate = _fuelDal.GetById(request.Id);
+        Fuel fuelToUpdate = _fuelDal.Get(predicate: model => model. Id == request.Id);
         fuelToUpdate.Name = request.Name;
         _fuelDal.Update(fuelToUpdate);
         UpdateFuelResponse response = _mapper.Map<UpdateFuelResponse>(fuelToUpdate);
@@ -46,7 +46,7 @@ public class FuelManager : IFuelService
     public bool Delete(DeleteFuelRequest request)
     {
         _fuelBusinessRules.CheckIfFuelIdExists(request.Id);
-        Fuel fuelToDelete = _fuelDal.GetById(request.Id);
+        Fuel fuelToDelete = _fuelDal.Get(predicate: model => model. Id == request.Id);
         _fuelDal.Delete(fuelToDelete);
         return true;
     }
@@ -60,7 +60,7 @@ public class FuelManager : IFuelService
     public Fuel GetById(int id)
     {
         _fuelBusinessRules.CheckIfFuelIdExists(id);
-        Fuel fuel = _fuelDal.GetById(id);
+        Fuel fuel = _fuelDal.Get(predicate: model => model. Id == id);
         return fuel;
     }
 }

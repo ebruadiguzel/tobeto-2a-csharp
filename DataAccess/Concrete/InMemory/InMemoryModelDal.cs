@@ -6,14 +6,15 @@ namespace DataAccess.Concrete.InMemory;
 
 public class InMemoryModelDal : InMemoryEntityRepositoryBase<Model, int>, IModelDal
 {
-    protected readonly HashSet<Model> _entities = new();
+    protected readonly HashSet<Model> Entities = new();
     public InMemoryModelDal()
     {
         
     }
     protected override int generateId()
     {
-        throw new NotImplementedException();
+        int nextId = Entities.Count == 0 ? 1 : Entities.Max(e => e.Id) + 1;
+        return nextId;
     }
 
     public IList<Model> GetByFuelName(string fuelName)

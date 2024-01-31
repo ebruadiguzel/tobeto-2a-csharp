@@ -1,11 +1,15 @@
 using AutoMapper;
 using Business.Abstract;
 using Business.BusinessRules;
+using Business.Profiles.Validation.FluentValidation.Model;
 using Business.Requests.Model;
-using Business.Responses.Fuel;
 using Business.Responses.Model;
 using DataAccess.Abstract;
 using Entities.Concrete;
+using FluentValidation;
+using System.Reflection;
+using Core.CrossCuttingConcerns.Validation.FluentValidation;
+using FluentValidation.Results;
 
 namespace Business.Concrete;
 
@@ -24,59 +28,115 @@ public class ModelManager : IModelService
     
     public AddModelResponse Add(AddModelRequest request)
     {
-        _modelBusinessRules.CheckNameLengthGreaterThanTwo(request.Name);
-        _modelBusinessRules.CheckDailyPriceGreaterThanZero(request.DailyPrice);
+        ValidationTool.Validate(new AddModelRequestValidator(), request);
         
-        Model modelToAdd = _mapper.Map<Model>(request);
-
-        _modelDal.Add(modelToAdd);
-
-        AddModelResponse response = _mapper.Map<AddModelResponse>(modelToAdd);
+        _modelBusinessRules.CheckIfModelNameExists(request.Name);
+        _modelBusinessRules.CheckIfModelYearShouldBeInLast20Years(request.Year);
         
+        // mapping
+        var modelToAdd = _mapper.Map<Model>(request);
+        
+        Model addedModel = _modelDal.Add(modelToAdd);
+        
+        // mapping & response
+        var response = _mapper.Map<AddModelResponse>(addedModel);
+        
+        return response;
+        
+    }
+    
+    public GetModelListResponse GetList(GetModelListRequest request)
+    {
+        // business rules
+
+        // data access
+
+        //bool predicate(Model model)
+        //{
+        //    return (request.FilterByBrandId == null || model.BrandId == request.FilterByBrandId)
+        //        && (request.FilterByFuelId == null || model.FuelId == request.FilterByFuelId)
+        //        && (
+        //            request.FilterByTransmissionId == null
+        //            || model.TransmissionId == request.FilterByTransmissionId
+        //        );
+        //}
+        //IList<Model> modelList = _modelDal.GetList(predicate);
+
+        IList<Model> modelList = _modelDal.GetList(
+            predicate: model =>
+                (request.FilterByBrandId == null || model.BrandId == request.FilterByBrandId)
+                && (request.FilterByFuelId == null || model.FuelId == request.FilterByFuelId)
+                && (
+                    request.FilterByTransmissionId == null
+                    || model.TransmissionId == request.FilterByTransmissionId
+                )
+        );
+
+        // mapping & response
+        var response = _mapper.Map<GetModelListResponse>(modelList);
+        //var responseWithoutAutoMapper = new GetModelListResponse();
+        //responseWithoutAutoMapper.Items = modelList
+        //    .Select(
+        //        model =>
+        //            new ModelListItemDto
+        //            {
+        //                BrandId = model.BrandId,
+        //                BrandName = model.Brand.Name,
+        //                FuelId = model.FuelId,
+        //                FuelName = model.Fuel.Name,
+        //                Id = model.Id,
+        //                Name = model.Name,
+        //                TransmissionId = model.TransmissionId,
+        //                TransmissionName = model.Transmission.Name
+        //            }
+        //    )
+        //    .ToList();
         return response;
     }
 
     public UpdateModelResponse Update(UpdateModelRequest request)
     {
-        _modelBusinessRules.CheckIfModelIdExists(request.Id);
-        _modelBusinessRules.CheckNameLengthGreaterThanTwo(request.Name);
-        _modelBusinessRules.CheckDailyPriceGreaterThanZero(request.DailyPrice);
-        
-        Model modelToUpdate = _modelDal.GetById(request.Id);
-        
-        modelToUpdate.Name = request.Name;
-        modelToUpdate.BrandId = request.BrandId;
-        modelToUpdate.FuelId = request.FuelId;
-        modelToUpdate.TransmissionId = request.TransmissionId;
-        modelToUpdate.DailyPrice = request.DailyPrice;
-        modelToUpdate.UpdateAt = DateTime.UtcNow;
-        
-        _modelDal.Update(modelToUpdate);
-        
-        UpdateModelResponse response = _mapper.Map<UpdateModelResponse>(modelToUpdate);
-        
+        Model? modelToUpdate = _modelDal.Get(predicate: model => model.Id == request.Id); // 0x123123
+        _modelBusinessRules.CheckIfModelExists(modelToUpdate);
+        _modelBusinessRules.CheckIfModelYearShouldBeInLast20Years(request.Year);
+
+        //modelToUpdate = _mapper.Map<Model>(request); // 0x333123
+        /* Bunu kullanmayacağız çünkü bizim için yeni bir nesne (referans) oluşturuyor.
+        Ve ayrıca entity sınıfında olup da request sınıfında olmayan alanlar (örn. CreatedAt vb.) varsayılan değerler alacak,
+        böylece yanlış bir veri güncellemesi yapmış oluruz. */
+        modelToUpdate = _mapper.Map(request, modelToUpdate); // 0x123123
+        Model updatedModel = _modelDal.Update(modelToUpdate!); // 0x123123
+        var response = _mapper.Map<UpdateModelResponse>(
+            updatedModel // 0x123123
+        );
         return response;
     }
 
-    public bool Delete(DeleteModelRequest request)
+    public DeleteModelResponse Delete(DeleteModelRequest request)
     {
-        _modelBusinessRules.CheckIfModelIdExists(request.Id);
-        Model modelToDelete = _modelDal.GetById(request.Id);
-        _modelDal.Delete(modelToDelete);
-        return true;
+        Model? modelToDelete = _modelDal.Get(predicate: model => model.Id == request.Id);
+        _modelBusinessRules.CheckIfModelExists(modelToDelete!);
+
+        Model deletedModel = _modelDal.Delete(modelToDelete);
+        
+        var response = _mapper.Map<DeleteModelResponse>(deletedModel);
+        return response;
     }
+    
 
     public IList<Model> GetList()
     {
         IList<Model> modelList = _modelDal.GetList();
         return modelList;
     }
-
-    public Model GetById(int id)
+    
+    public GetModelByIdResponse GetById(GetModelByIdRequest request)
     {
-        _modelBusinessRules.CheckIfModelIdExists(id);
-        Model model = _modelDal.GetById(id);
-        return model;
+        Model? model = _modelDal.Get(predicate: model => model.Id == request.Id);
+        _modelBusinessRules.CheckIfModelExists(model);
+
+        var response = _mapper.Map<GetModelByIdResponse>(model);
+        return response;
     }
 
     public IList<Model> GetListByFuelName(string fuelName)

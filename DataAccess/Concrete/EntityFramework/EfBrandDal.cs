@@ -4,32 +4,27 @@ using Entities.Concrete;
 namespace DataAccess.Concrete.EntityFramework;
 internal class EfBrandDal : IBrandDal
 {
-    public void Add(Brand entity)
+    public IList<Brand> GetList(Func<Brand, bool> predicate = null)
     {
         throw new NotImplementedException();
     }
 
-    public void Delete(Brand entity)
+    public Brand Get(Func<Brand, bool> predicate)
     {
         throw new NotImplementedException();
     }
 
-    //public IList<Brand> GetBrandsByNameSearch(string nameSearch)
-    //{
-    //    throw new NotImplementedException();
-    //}
-
-    public Brand? GetById(int id)
+    public Brand Add(Brand entity)
     {
         throw new NotImplementedException();
     }
 
-    public IList<Brand> GetList()
+    public Brand Update(Brand entity)
     {
         throw new NotImplementedException();
     }
 
-    public void Update(Brand entity)
+    public Brand Delete(Brand entity, bool softDelete)
     {
         throw new NotImplementedException();
     }

@@ -36,7 +36,7 @@ public class TransmissionManager : ITransmissionService
     public UpdateTransmissionResponse Update(UpdateTransmissionRequest request)
     {
         _transmissionBusinessRules.CheckIfTransmissionIdExists(request.Id);
-        Transmission transmissionToUpdate = _transmissionDal.GetById(request.Id);
+        Transmission transmissionToUpdate = _transmissionDal.Get(predicate: model => model. Id == request.Id);
         transmissionToUpdate.Name = request.Name;
         _transmissionDal.Update(transmissionToUpdate);
         UpdateTransmissionResponse response = _mapper.Map<UpdateTransmissionResponse>(transmissionToUpdate);
@@ -46,7 +46,7 @@ public class TransmissionManager : ITransmissionService
     public bool Delete(DeleteTransmissionRequest request)
     {
         _transmissionBusinessRules.CheckIfTransmissionIdExists(request.Id);
-        Transmission transmissionToDelete = _transmissionDal.GetById(request.Id);
+        Transmission transmissionToDelete = _transmissionDal.Get(predicate: model => model. Id == request.Id);
         _transmissionDal.Delete(transmissionToDelete);
         return true;
     }
@@ -60,7 +60,7 @@ public class TransmissionManager : ITransmissionService
     public Transmission GetById(int id)
     {
         _transmissionBusinessRules.CheckIfTransmissionIdExists(id);
-        Transmission transmission = _transmissionDal.GetById(id);
+        Transmission transmission = _transmissionDal.Get(predicate: model => model. Id == id);
         return transmission;
     }
 }
