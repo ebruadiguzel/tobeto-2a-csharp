@@ -14,10 +14,14 @@ public class Model : Entity<int>
     
     public short Year { get; set; }
     public decimal DailyPrice { get; set; }
+    public string ImageUrl { get; set; }
 
-    public Model(){}
+    public Model(string imageUrl)
+    {
+        ImageUrl = imageUrl;
+    }
     
-    public Model(int brandId, string name, int fuelId, int transmissionId,short year, decimal dailyPrice)
+    public Model(int brandId, string name, int fuelId, int transmissionId,short year, decimal dailyPrice, string imageUrl)
     {
         BrandId = brandId;
         Name = name;
@@ -25,6 +29,12 @@ public class Model : Entity<int>
         TransmissionId = transmissionId;
         Year = year;
         DailyPrice = dailyPrice;
+        ImageUrl = imageUrl;
+    }
+
+    public Model()
+    {
+        throw new NotImplementedException();
     }
 
     //lazy loading

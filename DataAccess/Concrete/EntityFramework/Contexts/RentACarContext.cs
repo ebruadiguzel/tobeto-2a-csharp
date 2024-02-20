@@ -1,3 +1,4 @@
+using Core.Entities;
 using Entities.Concrete;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +12,7 @@ public class RentACarContext : DbContext
     public DbSet<Model> Models { get; set; }
     public DbSet<Car> Cars { get; set; }
     
-    public DbSet<Users> Users { get; set; }
+    public DbSet<User> Users { get; set; }
     public DbSet<Customers> Customers { get; set; }
 
     public DbSet<IndividualCustomer> IndividualCustomer { get; set; }
@@ -21,4 +22,15 @@ public class RentACarContext : DbContext
 
     public RentACarContext(DbContextOptions dbContextOptions) : base(dbContextOptions) { }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        //modelBuilder.Entity<Brand>().HasKey(i => i.Id).HasName("Markalar"); // EF Core Naming Convention BrandId
+        modelBuilder.Entity<Brand>(i =>
+        {
+            //i.ToTable("Markalar");
+            i.HasKey(i => i.Id);
+            i.Property(i => i.Premium).HasDefaultValue(true);
+        });
+        base.OnModelCreating(modelBuilder); // normalde yaptığı işlemleri sürdürür
+    }
 }

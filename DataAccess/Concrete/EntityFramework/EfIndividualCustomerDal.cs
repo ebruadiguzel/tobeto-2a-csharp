@@ -5,10 +5,9 @@ using Entities.Concrete;
 
 namespace DataAccess.Concrete.EntityFramework;
 
-public class EfCarDal : EfEntityRepositoryBase<Car, int, RentACarContext>, ICarDal
+public class EfIndividualCustomerDal : EfEntityRepositoryBase<IndividualCustomer, int, RentACarContext>, IIndividualCustomerDal
 {
-    public EfCarDal(RentACarContext context) : base(context)
+    public EfIndividualCustomerDal(RentACarContext context) : base(context)
     {
     }
-    
 }

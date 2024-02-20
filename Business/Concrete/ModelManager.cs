@@ -34,6 +34,7 @@ public class ModelManager : IModelService
         _modelBusinessRules.CheckIfModelYearShouldBeInLast20Years(request.Year);
         
         // mapping
+        _modelBusinessRules.CheckIfBrandExists(request.BrandId);
         var modelToAdd = _mapper.Map<Model>(request);
         
         Model addedModel = _modelDal.Add(modelToAdd);
@@ -99,6 +100,7 @@ public class ModelManager : IModelService
         Model? modelToUpdate = _modelDal.Get(predicate: model => model.Id == request.Id); // 0x123123
         _modelBusinessRules.CheckIfModelExists(modelToUpdate);
         _modelBusinessRules.CheckIfModelYearShouldBeInLast20Years(request.Year);
+        _modelBusinessRules.CheckIfBrandExists(request.BrandId);
 
         //modelToUpdate = _mapper.Map<Model>(request); // 0x333123
         /* Bunu kullanmayacağız çünkü bizim için yeni bir nesne (referans) oluşturuyor.

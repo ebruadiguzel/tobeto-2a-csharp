@@ -1,31 +1,13 @@
-﻿using DataAccess.Abstract;
+﻿using Core.DataAccess.EntityFramework;
+using DataAccess.Abstract;
+using DataAccess.Concrete.EntityFramework.Contexts;
 using Entities.Concrete;
 
 namespace DataAccess.Concrete.EntityFramework;
-internal class EfBrandDal : IBrandDal
+
+public class EfBrandDal : EfEntityRepositoryBase<Brand, int, RentACarContext>, IBrandDal
 {
-    public IList<Brand> GetList(Func<Brand, bool> predicate = null)
+    public EfBrandDal(RentACarContext context) : base(context)
     {
-        throw new NotImplementedException();
-    }
-
-    public Brand Get(Func<Brand, bool> predicate)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Brand Add(Brand entity)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Brand Update(Brand entity)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Brand Delete(Brand entity, bool softDelete)
-    {
-        throw new NotImplementedException();
     }
 }
