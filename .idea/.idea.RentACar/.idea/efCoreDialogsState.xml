@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="EfCoreDialogsState">
+    <option name="keyValueStorage">
+      <map>
+        <entry key="Common:305491c8-d8d5-4f23-a912-2c0c6716e58f:dbContext" value="DataAccess.Concrete.EntityFramework.Contexts.RentACarContext" />
+        <entry key="Common:975621cc-0639-43cb-bb0a-1906ebbd7248:dbContext" value="DataAccess.Concrete.EntityFramework.Contexts.RentACarContext" />
+        <entry key="Common:buildConfiguration" value="Debug" />
+        <entry key="Common:enableDiagnosticLogging" value="false" />
+        <entry key="Common:noBuild" value="false" />
+        <entry key="Common:outputFolder" value="Migrations" />
+        <entry key="Common:useDefaultConnection" value="true" />
+      </map>
+    </option>
+  </component>
+</project>
