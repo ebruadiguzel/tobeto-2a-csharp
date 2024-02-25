@@ -34,12 +34,16 @@ public class UserManager : IUserService
     public AccessToken Login(LoginRequest request)
     {
         User? user = _usersDal.Get(i => i.Email == request.Email);
+        
         // Business Rules...
 
         bool isPasswordCorrect = HashingHelper.VerifyPassword(request.Password, user.PasswordHash, user.PasswordSalt);
         if (!isPasswordCorrect)
             throw new Exception("Şifre yanlış.");
-        return _tokenHelper.CreateToken(user);
+
+        var userRoles = _usersDal.GetUserRolesByUserId(user.Id);
+        
+        return _tokenHelper.CreateToken(user, userRoles);
     }
 
     public void Register(RegisterRequest request)

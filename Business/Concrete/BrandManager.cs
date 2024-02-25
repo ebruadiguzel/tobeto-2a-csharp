@@ -5,6 +5,8 @@ using Business.Requests.Brand;
 using Business.Responses.Brand;
 using DataAccess.Abstract;
 using Entities.Concrete;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 
 namespace Business.Concrete;
 
@@ -14,16 +16,34 @@ public class BrandManager : IBrandService
     // private readonly IModelDal _modelDal;
     private readonly BrandBusinessRules _brandBusinessRules;
     private readonly IMapper _mapper;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public BrandManager(IBrandDal brandDal, BrandBusinessRules brandBusinessRules, IMapper mapper)
+    public BrandManager(IBrandDal brandDal, BrandBusinessRules brandBusinessRules, IMapper mapper, IHttpContextAccessor httpContextAccessor)
     {
         _brandDal = brandDal; //new InMemoryBrandDal(); // Başka katmanların class'ları new'lenmez. Bu yüzden dependency injection kullanıyoruz.
         _brandBusinessRules = brandBusinessRules;
         _mapper = mapper;
+        _httpContextAccessor = httpContextAccessor;
     }
 
+    // AOP => Aspect Oriented Programming - Autofac
+    // Pipeline
     public AddBrandResponse Add(AddBrandRequest request)
     {
+        if(!_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+        {
+            throw new Exception("Bu endpointi çalıştırmak için giriş yapmak zorundasınız!");
+        }
+
+        var userHasRole = _httpContextAccessor.HttpContext.User.Claims
+            .Where(a => a.Type == "Roles")
+            .Select(a => a.Value)
+            .Contains("BrandAdmin");
+        
+        if(!userHasRole)
+            throw new Exception("Yetkiniz yok!");
+        
+        
         // Authentication-Authorization
         // İş Kuralları
         _brandBusinessRules.CheckIfBrandNameNotExists(request.Name);

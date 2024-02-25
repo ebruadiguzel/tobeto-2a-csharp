@@ -6,6 +6,7 @@ using Business.Responses.Brand;
 using DataAccess.Abstract;
 using DataAccess.Concrete.InMemory;
 using Entities.Concrete;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,6 +33,7 @@ public class BrandsController : ControllerBase
     //}
 
     [HttpGet] // GET http://localhost:5245/api/brands
+    [Authorize]
     public GetBrandListResponse GetList([FromQuery] GetBrandListRequest request) // Referans tipleri varsayılan olarak request body'den alır.
     {
         GetBrandListResponse response = _brandService.GetList(request);
@@ -40,8 +42,11 @@ public class BrandsController : ControllerBase
 
     //[HttpPost("/add")] // POST http://localhost:5245/api/brands/add
     [HttpPost] // POST http://localhost:5245/api/brands
+    //[Authorize] // Controller içerisinde kullanılır.
+    [Authorize]
     public ActionResult<AddBrandResponse> Add(AddBrandRequest request)
     {
+        // Log kodları
         try
         {
             AddBrandResponse response = _brandService.Add(request);

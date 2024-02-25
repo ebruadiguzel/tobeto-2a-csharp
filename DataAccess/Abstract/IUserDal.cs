@@ -5,6 +5,6 @@ namespace DataAccess.Abstract;
 
 public interface IUserDal : IEntityRepository<User, int>
 {
-    
-    
+    IEnumerable<UserRoles> GetUserRolesByUserId(int userId);
+
 }

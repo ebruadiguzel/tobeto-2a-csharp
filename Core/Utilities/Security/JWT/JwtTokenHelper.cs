@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 using Core.Entities;
 using Microsoft.Extensions.Configuration;
@@ -17,19 +18,26 @@ public class JwtTokenHelper : ITokenHelper
         _tokenOptions = _configuration.GetSection("TokenOptions").Get<TokenOptions>();
     }
 
-    public AccessToken CreateToken(User user)
+    public AccessToken CreateToken(User user, IEnumerable<UserRoles> userRoles)
     {
         // TODO: Refactor
         DateTime expirationTime = DateTime.Now.AddMinutes(_tokenOptions.ExpirationTime);
         SecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenOptions.SecurityKey));
         SigningCredentials signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512Signature);
 
+        var claims = new List<Claim>();
+        foreach (var userRole in userRoles)
+        {
+            claims.Add(new Claim("Roles",userRole.Role.Code));
+        }
+        
         JwtSecurityToken jwt = new JwtSecurityToken(
             issuer: _tokenOptions.Issuer,
             audience: _tokenOptions.Audience,
             expires: expirationTime,
             signingCredentials: signingCredentials,
-            notBefore: DateTime.Now
+            notBefore: DateTime.Now,
+            claims: claims
         );
 
         JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();

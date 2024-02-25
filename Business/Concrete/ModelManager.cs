@@ -10,6 +10,7 @@ using FluentValidation;
 using System.Reflection;
 using Core.CrossCuttingConcerns.Validation.FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Http;
 
 namespace Business.Concrete;
 
@@ -18,16 +19,26 @@ public class ModelManager : IModelService
      private readonly IModelDal _modelDal;
      private readonly ModelBusinessRules _modelBusinessRules;
      private readonly IMapper _mapper;
-     
-    public ModelManager(IModelDal modelDal, ModelBusinessRules modelBusinessRules, IMapper mapper)
+     private readonly IHttpContextAccessor _httpContextAccessor;
+
+     public ModelManager(IModelDal modelDal, ModelBusinessRules modelBusinessRules, IMapper mapper, IHttpContextAccessor httpContextAccessor)
     {
         _modelDal = modelDal;
         _modelBusinessRules = modelBusinessRules;
         _mapper = mapper;
+        _httpContextAccessor = httpContextAccessor;
     }
     
     public AddModelResponse Add(AddModelRequest request)
     {
+        var userHasRole = _httpContextAccessor.HttpContext.User.Claims
+            .Where(a => a.Type == "Roles")
+            .Select(a => a.Value)
+            .Contains("ModelAdmin");
+        
+        if(!userHasRole)
+            throw new Exception("Yetkiniz yok!");
+        
         ValidationTool.Validate(new AddModelRequestValidator(), request);
         
         _modelBusinessRules.CheckIfModelNameExists(request.Name);
@@ -97,6 +108,14 @@ public class ModelManager : IModelService
 
     public UpdateModelResponse Update(UpdateModelRequest request)
     {
+        var userHasRole = _httpContextAccessor.HttpContext.User.Claims
+            .Where(a => a.Type == "Roles")
+            .Select(a => a.Value)
+            .Contains("ModelAdmin");
+        
+        if(!userHasRole)
+            throw new Exception("Yetkiniz yok!");
+        
         Model? modelToUpdate = _modelDal.Get(predicate: model => model.Id == request.Id); // 0x123123
         _modelBusinessRules.CheckIfModelExists(modelToUpdate);
         _modelBusinessRules.CheckIfModelYearShouldBeInLast20Years(request.Year);

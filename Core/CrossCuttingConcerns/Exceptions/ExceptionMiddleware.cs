@@ -44,7 +44,7 @@ public class ExceptionMiddleware
     }
 
     private Task handleExceptionAsync(HttpContext httpContext, Exception exception)
-    {
+        {
         httpContext.Response.ContentType = MediaTypeNames.Application.Json;
 
         //if (exception.GetType() == typeof(BusinessException))

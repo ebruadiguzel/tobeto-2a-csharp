@@ -14,12 +14,11 @@ public class RentACarContext : DbContext
     
     public DbSet<User> Users { get; set; }
     public DbSet<Customers> Customers { get; set; }
-
     public DbSet<IndividualCustomer> IndividualCustomer { get; set; }
-
     public DbSet<CorporateCustomer> CorporateCustomer { get; set; }
-
-
+    
+    public DbSet<UserRoles> UserRoles { get; set; }
+    public DbSet<Role> Roles { get; set; }
     public RentACarContext(DbContextOptions dbContextOptions) : base(dbContextOptions) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
